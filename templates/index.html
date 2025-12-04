@@ -1,0 +1,72 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>健康追蹤</title>
+</head>
+<body>
+    <h1>健康追蹤</h1>
+    <form id="healthForm">
+        <label for="age">年齡:</label>
+        <input type="number" id="age" name="age"><br>
+
+        <label for="gender">性別:</label>
+        <select id="gender" name="gender">
+            <option value="male">男</option>
+            <option value="female">女</option>
+        </select><br>
+
+        <label for="height">身高 (m):</label>
+        <input type="number" id="height" name="height" step="0.01"><br>
+
+        <label for="weight">體重 (kg):</label>
+        <input type="number" id="weight" name="weight"><br>
+
+        <label for="target">健康目標:</label>
+        <select id="target" name="target">
+            <option value="減脂">減脂</option>
+            <option value="增肌">增肌</option>
+            <option value="維持體重">維持體重</option>
+        </select><br>
+
+        <button type="submit">提交</button>
+    </form>
+
+    <div id="result">
+        <h2>結果:</h2>
+        <p id="bmi"></p>
+        <p id="dietAdvice"></p>
+        <p id="exerciseAdvice"></p>
+    </div>
+
+    <script>
+        document.getElementById('healthForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const userData = {
+                age: document.getElementById('age').value,
+                gender: document.getElementById('gender').value,
+                height: parseFloat(document.getElementById('height').value),
+                weight: parseFloat(document.getElementById('weight').value),
+                target: document.getElementById('target').value
+            };
+
+            fetch('/health', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(userData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('bmi').textContent = `BMI: ${data.bmi} (${data.bmi_status})`;
+                document.getElementById('dietAdvice').textContent = `飲食建議: ${data.diet_advice} 每日攝取熱量: ${data.calories_needed} 卡`;
+                document.getElementById('exerciseAdvice').textContent = `運動建議: ${data.exercise_advice}`;
+            });
+        });
+    </script>
+</body>
+</html>
